@@ -13,7 +13,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 config = Config()
 
 def load_generator():
-	generator = Generator(config.latent_size)
+	generator = Generator(config.latent_size).to(config.device)
 	model = torch.load(config.model_path, map_location=config.device)
 	generator.load_state_dict(model['Generator_state_dict'])
 	return generator
