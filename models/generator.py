@@ -2,29 +2,29 @@ import torch
 import torch.nn as nn
 
 class Generator(nn.Module):
-    def __init__(self, latent_size=100, base_size=1024):
+    def __init__(self, latent_size=100, base_size=128):
         super().__init__()
 
         self.latent_size = latent_size
 
         self.conv_layers = nn.Sequential(
-            nn.ConvTranspose2d(latent_size, base_size, 4, 1, padding=0, bias=False),
+            nn.ConvTranspose2d(latent_size, base_size * 8, 4, 1, padding=0, bias=False),
+            nn.BatchNorm2d(base_size * 8),
+            nn.ReLU(True),
+
+            nn.ConvTranspose2d(base_size * 8, base_size * 4, 4, 2, padding=1, bias=False),
+            nn.BatchNorm2d(base_size * 4),
+            nn.ReLU(True),
+
+            nn.ConvTranspose2d(base_size * 4, base_size * 2, 4, 2, padding=1, bias=False),
+            nn.BatchNorm2d(base_size * 2),
+            nn.ReLU(True),
+
+            nn.ConvTranspose2d(base_size * 2, base_size, 4, 2, padding=1, bias=False),
             nn.BatchNorm2d(base_size),
             nn.ReLU(True),
 
-            nn.ConvTranspose2d(base_size, base_size // 2, 4, 2, padding=1, bias=False),
-            nn.BatchNorm2d(base_size // 2),
-            nn.ReLU(True),
-
-            nn.ConvTranspose2d(base_size // 2, base_size // 4, 4, 2, padding=1, bias=False),
-            nn.BatchNorm2d(base_size // 4),
-            nn.ReLU(True),
-
-            nn.ConvTranspose2d(base_size // 4, base_size // 8, 4, 2, padding=1, bias=False),
-            nn.BatchNorm2d(base_size // 8),
-            nn.ReLU(True),
-
-            nn.ConvTranspose2d(base_size // 8, 3, 4, 2, padding=1, bias=False),
+            nn.ConvTranspose2d(base_size, 3, 4, 2, padding=1, bias=False),
             nn.Tanh()
         )
 
