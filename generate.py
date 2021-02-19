@@ -3,9 +3,9 @@ import torch
 import numpy as np
 from PIL import Image
 
-from models.generator import Generator 
 from utils.config import Config
 from utils.utils import prepare_result
+from models.generator import Generator 
 
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)

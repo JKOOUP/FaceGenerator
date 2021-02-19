@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 class Generator(nn.Module):
-    def __init__(self, latent_size=100, base_size=128):
+    def __init__(self, latent_size=100, base_size=64):
         super().__init__()
 
         self.latent_size = latent_size

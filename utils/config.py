@@ -22,7 +22,7 @@ class Config():
 	    self.img_size = 64
 
 	    #Number of images in one batch
-	    self.batch_size = 128
+	    self.batch_size = 32
 
 	    #Number of learning epochs
 	    self.num_epoch = 1

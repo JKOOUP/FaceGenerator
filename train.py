@@ -3,23 +3,16 @@ import torch.nn as nn
 from torchvision import transforms, datasets
 
 from models.generator import Generator
+from models.dataset import CelebADataset
 from models.discriminator import Discriminator
+
 from utils.utils import weights_init
 from utils.config import Config
 
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
 
 config = Config()
-
-def get_dataset(path):
-	transformer = transforms.Compose([
-		transforms.Resize(config.img_size),
-    transforms.CenterCrop(config.img_size),
-		transforms.ToTensor(),
-		transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-	])
-
-	dataset = datasets.ImageFolder(root=path, transform=transformer)
-	return dataset
 
 def get_dataloader(dataset):
 	loader = torch.utils.data.DataLoader(dataset, batch_size=config.batch_size, shuffle=True)
@@ -70,7 +63,7 @@ def train(loader, D, G, optim_D, optim_G, criterion):
 	D_losses = [0]
 
 	for i in range(config.num_epoch):
-		for data, _ in loader:
+		for data in loader:
 			current_size = data.size(0)
 
 			labels0 = torch.tensor([0] * current_size).to(config.device, torch.float)
@@ -98,7 +91,8 @@ def train(loader, D, G, optim_D, optim_G, criterion):
 
 
 if __name__ == '__main__':
-	dataset = get_dataset(config.data_path)
+	dataset = CelebADataset()
+
 	dataloader = get_dataloader(dataset)
 
 	G = Generator(config.latent_size).to(config.device)
