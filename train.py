@@ -18,7 +18,7 @@ def get_dataloader(dataset):
 	loader = torch.utils.data.DataLoader(dataset, batch_size=config.batch_size, shuffle=True)
 	return loader
 
-def D_train(data, D, G, current_size, labels0, labels1, noise):
+def D_train(data, D, G, optim_D, criterion, current_size, labels0, labels1, noise):
     D.train()
     D.zero_grad()
 
@@ -33,24 +33,29 @@ def D_train(data, D, G, current_size, labels0, labels1, noise):
     D_loss2 = criterion(outp, labels0)
 
     D_loss = D_loss1 + D_loss2
+
     D_loss.backward()
     optim_D.step()
 
-    return D_loss.mean().item()
+    return D_loss.item()
 
-def G_train(D, G, current_size, labels0, labels1, noise):
+def G_train(D, G, optim_G, criterion, current_size, labels0, labels1, noise):
     G.train()
     G.zero_grad()
 
     results = G(noise)
     outp = D(results).view(current_size)
 
-    G_loss = criterion(outp, labels1)
+    if config.flip_labels == True:
+    	if torch.randn(1) > 0.8:
+    		G_loss = criterion(outp, labels0)
+    	else: 
+    		G_loss = criterion(outp, labels1)
 
     G_loss.backward()
     optim_G.step()
 
-    return G_loss.mean().item()
+    return G_loss.item()
 
 def log_history(epoch, iters, num_iters, D_losses, G_losses):
 	print('Epoch: {}, Batch: {}/{}, G loss: {:.4f}, D loss: {:.4f}'.format(
@@ -71,8 +76,9 @@ def train(loader, D, G, optim_D, optim_G, criterion):
 
 			noise = torch.randn((current_size, config.latent_size, 1, 1)).to(config.device)
 
-			D_loss = D_train(data, D, G, current_size, labels0, labels1, noise)
-			G_loss = G_train(D, G, current_size, labels0, labels1, noise)
+			D_loss = D_train(data, D, G, optim_D, criterion, current_size, labels0, labels1, noise)
+			
+			G_loss = G_train(D, G, optim_G, criterion, current_size, labels0, labels1, noise)
 
 			iters += 1
 			D_losses.append(D_loss)

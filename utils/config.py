@@ -22,7 +22,7 @@ class Config():
 	    self.img_size = 64
 
 	    #Number of images in one batch
-	    self.batch_size = 32
+	    self.batch_size = 8
 
 	    #Number of learning epochs
 	    self.num_epoch = 1
@@ -34,4 +34,7 @@ class Config():
 	    self.data_path = './data/dataset/'
 
 	    #Learning rate
-	    self.lr = 0.002
+	    self.lr = 0.0002
+
+	    #Flip labels sometimes while training generator
+	    self.flip_labels = True
