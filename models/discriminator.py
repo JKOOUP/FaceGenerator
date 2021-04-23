@@ -9,22 +9,22 @@ class Discriminator(nn.Module):
 
         self.conv_layers = nn.Sequential(
             nn.Conv2d(3, base_size, 4, 2, padding=1, bias=False),
-            nn.ReLU(True),
+            nn.BatchNorm2d(base_size),
+            nn.LeakyReLU(0.1, True),
 
             nn.Conv2d(base_size, base_size * 2, 4, 2, padding=1, bias=False),
             nn.BatchNorm2d(base_size * 2),
-            nn.ReLU(True),
+            nn.LeakyReLU(0.1, True),
 
             nn.Conv2d(base_size * 2, base_size * 4, 4, 2, padding=1, bias=False),
             nn.BatchNorm2d(base_size * 4),
-            nn.ReLU(True),
+            nn.LeakyReLU(0.1, True),
 
             nn.Conv2d(base_size * 4, base_size * 8, 4, 2, padding=1, bias=False),
             nn.BatchNorm2d(base_size * 8),
-            nn.ReLU(True),
+            nn.LeakyReLU(0.1, True),
 
-            nn.Conv2d(base_size * 8, 1, 4, 1, padding=0, bias=False),
-            nn.Sigmoid(),
+            nn.Conv2d(base_size * 8, 2, 4, 1, padding=0, bias=False),
         )
      
     def forward(self, x):

@@ -9,6 +9,13 @@ class Config():
 	    #Folder for saving results
 	    self.save_path = './data/res/'
 
+	    #Path to data
+	    self.data_path = './data/dataset/'
+
+	    #Continue training
+	    self.continue_training = False
+	    self.train_model_path = './checkpoints/model_0_1.7589_10.8377.pth'
+
 	    #Image format
 	    self.save_format = 'PNG'
 
@@ -25,13 +32,10 @@ class Config():
 	    self.batch_size = 8
 
 	    #Number of learning epochs
-	    self.num_epoch = 1
+	    self.num_epoch = 3
 
 	    #Log printing frequency
 	    self.log_iter = 10
-
-	    #Path to data
-	    self.data_path = './data/dataset/'
 
 	    #Learning rate
 	    self.lr = 0.0002
