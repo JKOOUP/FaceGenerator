@@ -1,4 +1,4 @@
-## Face generator: Deep Convolutional Generative Adversarial Network for face generation
+# Face generator: Deep Convolutional Generative Adversarial Network for face generation
 
 
 ### Introduction
