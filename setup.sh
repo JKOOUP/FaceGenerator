@@ -1,5 +1,6 @@
 mkdir data/
 mkdir data/res
+mkdir data/train_samples
 
 mkdir checkpoints/
 cd checkpoints/

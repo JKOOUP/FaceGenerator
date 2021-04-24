@@ -1,3 +1,4 @@
+import os
 import time
 import torch
 import torch.nn as nn
@@ -7,7 +8,7 @@ from models.generator import Generator
 from models.dataset import CelebADataset
 from models.discriminator import Discriminator
 
-from utils.utils import Timer, weights_init
+from utils.utils import Timer, weights_init, prepare_result
 from utils.config import Config
 
 import warnings
@@ -72,6 +73,15 @@ def log_epoch_history(epoch, num_iters, D_losses, G_losses, timer):
 		timer.get_last_epoch_time()
 	))
 
+def make_img_samples(generator):
+	latent_sample = generator.get_sample(1, config.device)
+	result = generator(latent_sample).clamp_(0, 1)
+
+	count = len(os.listdir(config.img_samples_path)) + 1
+
+	img = prepare_result(result)
+	img.save(config.img_samples_path + str(count) + '.' + config.save_format.lower(), config.save_format)
+
 def train(loader, D, G, optim_D, optim_G, criterion):
 	G_losses = [0]
 	D_losses = [0]
@@ -112,6 +122,11 @@ def train(loader, D, G, optim_D, optim_G, criterion):
 
 		timer.save_epoch_time()
 		log_epoch_history(i, len(loader), D_losses, G_losses, timer)
+
+		if i % config.make_img_samples == 0:
+			for x in range(5):
+				make_img_samples(G)
+
 
 def load_models_with_optims(G, optim_G, D, optim_D):
 	

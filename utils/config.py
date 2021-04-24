@@ -42,3 +42,8 @@ class Config:
 
 	    #Flip labels sometimes while training generator
 	    self.flip_labels = True
+
+	    #Generate 5 images after n epochs
+	    self.make_img_samples = 1
+
+	    self.img_samples_path = './data/train_samples/'
