@@ -1,6 +1,6 @@
 import torch
 
-class Config():
+class Config:
   	def __init__(self):
 
 	    #Path to model checkpoint
@@ -29,10 +29,10 @@ class Config():
 	    self.img_size = 64
 
 	    #Number of images in one batch
-	    self.batch_size = 8
+	    self.batch_size = 64
 
 	    #Number of learning epochs
-	    self.num_epoch = 3
+	    self.num_epoch = 5
 
 	    #Log printing frequency
 	    self.log_iter = 10

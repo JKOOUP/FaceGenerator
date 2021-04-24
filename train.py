@@ -1,3 +1,4 @@
+import time
 import torch
 import torch.nn as nn
 from torchvision import transforms, datasets
@@ -6,7 +7,7 @@ from models.generator import Generator
 from models.dataset import CelebADataset
 from models.discriminator import Discriminator
 
-from utils.utils import weights_init
+from utils.utils import Timer, weights_init
 from utils.config import Config
 
 import warnings
@@ -57,14 +58,25 @@ def G_train(D, G, optim_G, criterion, current_size, labels0, labels1, noise):
 
     return G_loss.item()
 
-def log_history(epoch, iters, num_iters, D_losses, G_losses):
+def log_batch_history(epoch, iters, num_iters, D_losses, G_losses, timer):
 	print('Epoch: {}, Batch: {}/{}, G loss: {:.4f}, D loss: {:.4f}'.format(
-    	epoch, iters, num_iters, G_losses[-1], D_losses[-1]
-  	))
+		epoch, iters, num_iters, G_losses[-1], D_losses[-1]
+	))
+	print('Elapsed time: {} sec'.format(timer.get_last_batch_time()))
+
+def log_epoch_history(epoch, num_iters, D_losses, G_losses, timer):
+	print('Epoch: {}, mean G loss: {:.4f}, mean D loss: {:.4f}, Elapsed time: {}'.format(
+		epoch, 
+		torch.tensor(G_losses[-num_iters:]).mean(), 
+		torch.tensor(D_losses[-num_iters:]).mean(),
+		timer.get_last_epoch_time()
+	))
 
 def train(loader, D, G, optim_D, optim_G, criterion):
 	G_losses = [0]
 	D_losses = [0]
+
+	timer = Timer()
 
 	for i in range(1, config.num_epoch + 1):
 		iters = 0
@@ -83,10 +95,11 @@ def train(loader, D, G, optim_D, optim_G, criterion):
 
 			iters += 1
 			D_losses.append(D_loss)
-			G_losses.append(G_loss)
+			G_losses.append(G_loss)			
 
 			if iters % config.log_iter == 0:
-				log_history(i, iters, len(loader), D_losses, G_losses)
+				timer.save_batch_time()
+				log_batch_history(i, iters, len(loader), D_losses, G_losses, timer)
 
 
 		save_path = './checkpoints/model_{}_{:.4f}_{:.4f}.pth'.format(i, D_losses[-1], G_losses[-1])
@@ -96,6 +109,9 @@ def train(loader, D, G, optim_D, optim_G, criterion):
 			'Discriminator_state_dict' : D.state_dict(),
 			'D_optim_state_dict' : optim_D.state_dict()
 		}, save_path)
+
+		timer.save_epoch_time()
+		log_epoch_history(i, len(loader), D_losses, G_losses, timer)
 
 def load_models_with_optims(G, optim_G, D, optim_D):
 	

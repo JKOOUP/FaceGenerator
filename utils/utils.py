@@ -1,3 +1,4 @@
+import time
 import torch
 import numpy as np
 import torch.nn as nn
@@ -22,3 +23,26 @@ def weights_init(model):
     elif classname.find('BatchNorm') != -1:
         nn.init.normal_(model.weight.data, 1.0, 0.02)
         nn.init.constant_(model.bias.data, 0)
+
+class Timer:
+	def __init__(self):
+		self.start_time = time.perf_counter()
+
+		self.batch_times = [self.start_time]
+		self.epoch_times = [self.start_time]
+
+	def save_batch_time(self):
+		self.batch_times.append(time.perf_counter())
+
+	def get_last_batch_time(self):
+		elapsed_time = self.batch_times[-1] - self.batch_times[-2]
+		return '{:.2f}'.format(elapsed_time)
+
+	def save_epoch_time(self):
+		self.epoch_times.append(time.perf_counter())
+
+	def get_last_epoch_time(self):
+		return self.log_time(int(self.epoch_times[-1] - self.epoch_times[-2]))
+
+	def log_time(self, curr_time):	
+		return '{:d}:{:02d}:{:02d}'.format(curr_time // 3600, (curr_time % 3600) // 60, curr_time % 60)
