@@ -9,6 +9,8 @@ from models.dataset import CelebADataset
 from models.discriminator import Discriminator
 
 from utils.utils import Timer, weights_init, prepare_result
+from utils.utils import log_batch_history, log_epoch_history
+from utils.utils import save_model, load_models_with_optims
 from utils.config import Config
 
 import warnings
@@ -59,20 +61,6 @@ def G_train(D, G, optim_G, criterion, current_size, labels0, labels1, noise):
 
     return G_loss.item()
 
-def log_batch_history(epoch, iters, num_iters, D_losses, G_losses, timer):
-	print('Epoch: {}, Batch: {}/{}, G loss: {:.4f}, D loss: {:.4f}'.format(
-		epoch, iters, num_iters, G_losses[-1], D_losses[-1]
-	))
-	print('Elapsed time: {} sec'.format(timer.get_last_batch_time()))
-
-def log_epoch_history(epoch, num_iters, D_losses, G_losses, timer):
-	print('Epoch: {}, mean G loss: {:.4f}, mean D loss: {:.4f}, Elapsed time: {}'.format(
-		epoch, 
-		torch.tensor(G_losses[-num_iters:]).mean(), 
-		torch.tensor(D_losses[-num_iters:]).mean(),
-		timer.get_last_epoch_time()
-	))
-
 def make_img_samples(generator):
 	latent_sample = generator.get_sample(1, config.device)
 	result = generator(latent_sample).clamp_(0, 1)
@@ -100,7 +88,6 @@ def train(loader, D, G, optim_D, optim_G, criterion):
 			noise = torch.randn((current_size, config.latent_size, 1, 1)).to(config.device)
 
 			D_loss = D_train(data, D, G, optim_D, criterion, current_size, labels0, labels1, noise)
-			
 			G_loss = G_train(D, G, optim_G, criterion, current_size, labels0, labels1, noise)
 
 			iters += 1
@@ -111,14 +98,7 @@ def train(loader, D, G, optim_D, optim_G, criterion):
 				timer.save_batch_time()
 				log_batch_history(i, iters, len(loader), D_losses, G_losses, timer)
 
-
-		save_path = './checkpoints/model_{}_{:.4f}_{:.4f}.pth'.format(i, D_losses[-1], G_losses[-1])
-		torch.save({
-			'Generator_state_dict' : G.state_dict(),    
-			'G_optim_state_dict' : optim_G.state_dict(),
-			'Discriminator_state_dict' : D.state_dict(),
-			'D_optim_state_dict' : optim_D.state_dict()
-		}, save_path)
+		save_model(i, G, optim_G, D, optim_D)
 
 		timer.save_epoch_time()
 		log_epoch_history(i, len(loader), D_losses, G_losses, timer)
@@ -126,19 +106,6 @@ def train(loader, D, G, optim_D, optim_G, criterion):
 		if i % config.make_img_samples == 0:
 			for x in range(5):
 				make_img_samples(G)
-
-
-def load_models_with_optims(G, optim_G, D, optim_D):
-	
-	model = torch.load(config.train_model_path, map_location=config.device)
-
-	G.load_state_dict(model['Generator_state_dict'])
-	D.load_state_dict(model['Discriminator_state_dict'])
-
-	optim_G.load_state_dict(model['G_optim_state_dict'])
-	optim_D.load_state_dict(model['D_optim_state_dict'])
-
-	return G, optim_G, D, optim_D
 
 
 if __name__ == '__main__':
@@ -153,7 +120,9 @@ if __name__ == '__main__':
 	optim_D = torch.optim.AdamW(D.parameters(), lr=config.lr, betas=(0.5, 0.999))
 
 	if (config.continue_training):
-		G, optim_G, D, optim_D = load_models_with_optims(G, optim_G, D, optim_D)
+		G, optim_G, D, optim_D = load_models_with_optims(
+			G, optim_G, D, optim_D, config.train_model_path, config.device
+		)
 	else:
 		G.apply(weights_init)
 		D.apply(weights_init)

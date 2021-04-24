@@ -29,7 +29,7 @@ class Config:
 	    self.img_size = 64
 
 	    #Number of images in one batch
-	    self.batch_size = 64
+	    self.batch_size = 8
 
 	    #Number of learning epochs
 	    self.num_epoch = 5
@@ -45,5 +45,4 @@ class Config:
 
 	    #Generate 5 images after n epochs
 	    self.make_img_samples = 1
-
 	    self.img_samples_path = './data/train_samples/'

@@ -24,6 +24,41 @@ def weights_init(model):
         nn.init.normal_(model.weight.data, 1.0, 0.02)
         nn.init.constant_(model.bias.data, 0)
 
+def log_batch_history(epoch, iters, num_iters, D_losses, G_losses, timer):
+	print('Epoch: {}, Batch: {}/{}, G loss: {:.4f}, D loss: {:.4f}'.format(
+		epoch, iters, num_iters, G_losses[-1], D_losses[-1]
+	))
+	print('Elapsed time: {} sec'.format(timer.get_last_batch_time()))
+
+def log_epoch_history(epoch, num_iters, D_losses, G_losses, timer):
+	print('Epoch: {}, mean G loss: {:.4f}, mean D loss: {:.4f}, Elapsed time: {}'.format(
+		epoch, 
+		torch.tensor(G_losses[-num_iters:]).mean(), 
+		torch.tensor(D_losses[-num_iters:]).mean(),
+		timer.get_last_epoch_time()
+	))
+
+def save_model(epoch, G, optim_G, D, optim_D):
+	save_path = './checkpoints/model_{}.pth'.format(epoch)
+	torch.save({
+		'Generator_state_dict' : G.state_dict(),    
+		'G_optim_state_dict' : optim_G.state_dict(),
+		'Discriminator_state_dict' : D.state_dict(),
+		'D_optim_state_dict' : optim_D.state_dict()
+	}, save_path)
+
+def load_models_with_optims(G, optim_G, D, optim_D, path, device):
+	
+	model = torch.load(path, map_location=device)
+
+	G.load_state_dict(model['Generator_state_dict'])
+	D.load_state_dict(model['Discriminator_state_dict'])
+
+	optim_G.load_state_dict(model['G_optim_state_dict'])
+	optim_D.load_state_dict(model['D_optim_state_dict'])
+
+	return G, optim_G, D, optim_D
+
 class Timer:
 	def __init__(self):
 		self.start_time = time.perf_counter()
