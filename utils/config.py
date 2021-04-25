@@ -12,6 +12,18 @@ class Config:
 	    #Image format
 	    self.save_format = 'PNG'
 
+	    #Dimension of latent space 
+	    self.latent_size = 100
+
+	    #Number of generated images 
+	    self.num_generated_images = 5
+
+	    #Device
+	    self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
+	   	#Size of generated images. Don't change this parameter.
+	    self.img_size = 64
+
 	    #Path to training dataset 
 	    self.data_path = './data/dataset/'
 
@@ -20,15 +32,6 @@ class Config:
 
 	    #Path to model to continue training
 	    self.train_model_path = ''
-
-	    #Device
-	    self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
-	    #Dimension of latent space 
-	    self.latent_size = 100
-
-	    #Size of generated images 
-	    self.img_size = 64
 
 	    #Batch size
 	    self.batch_size = 64
@@ -50,6 +53,3 @@ class Config:
 
 	    #Path to generated images while training
 	    self.img_samples_path = './data/train_samples/'
-
-	    #Number of generated images 
-	    self.num_generated_images = 5
