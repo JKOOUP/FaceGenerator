@@ -21,7 +21,8 @@ def load_generator():
 def get_tensor_image(latent_sample=0):
 	if latent_sample == 0:
 		latent_sample = generator.get_sample(1, config.device)
-	result = generator(latent_sample).clamp_(0, 1)
+	result = generator(latent_sample)
+	result = (result - result.min()) / (result.max() - result.min())
 	return result
 
 def save_result(result, path=config.save_path):
