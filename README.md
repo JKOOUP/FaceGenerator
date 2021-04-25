@@ -54,4 +54,4 @@ Also you can use your own dataset with simple structure:
 All parameters you can configure in `./utils/config.py`.
 
 ### Demo:
-![all text](https://github.com/JKOOUP/FaceGenerator/tree/master/demo/FaceGenerator.png?raw=true)
+![all text](https://github.com/JKOOUP/FaceGenerator/blob/master/demo/FaceGenerator.png?raw=true)
