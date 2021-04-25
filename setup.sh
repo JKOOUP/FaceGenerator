@@ -5,6 +5,6 @@ mkdir data/train_samples
 mkdir checkpoints/
 cd checkpoints/
 
-gdown 'https://drive.google.com/uc?id=1vXVh_LbICJl0cCmnyPVqIB6TXESymx7g'
+gdown --id 1Y6rfbjIUWpjIFFNP-kYgGdrli-ausyRf
 
 cd ..

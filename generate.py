@@ -32,5 +32,7 @@ def save_result(result, path=config.save_path):
 
 if __name__ == '__main__':
 	generator = load_generator()
-	tensor_img = get_tensor_image()
-	save_result(tensor_img)
+
+	for i in range(config.num_generated_images):
+		tensor_img = get_tensor_image()
+		save_result(tensor_img)
